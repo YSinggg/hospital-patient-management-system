@@ -7,7 +7,6 @@
 #include <iomanip>
 using namespace std;
 
-// Constants
 const int NUM_FACILITIES = 3;
 const int NUM_AGE_GROUPS = 5;
 const int NUM_CARE_TYPES = 6;
@@ -24,8 +23,6 @@ string fileNames[NUM_FACILITIES] = {
     "data/dataset3_facility_c.csv"
 };
 
-// Care types are in alphabetical order, so sorting by care type
-// gives alphabetical order.
 string careTypes[NUM_CARE_TYPES] = {
     "Emergency", "Inpatient", "Outpatient",
     "Rehabilitation", "Routine Checkup", "Vaccination"
@@ -41,40 +38,32 @@ string ageGroupLabels[NUM_AGE_GROUPS] = {
     "Senior Citizens / Geriatric Care"
 };
 
-// Width of the patient table (used to draw the lines)
 const int PATIENT_TABLE_WIDTH = 103;
 
-// Field numbers used for sorting and searching
 const int FIELD_AGE = 1;
-const int FIELD_STAY = 2;   // visit duration (length of stay)
+const int FIELD_STAY = 2;
 const int FIELD_COST = 3;
 const int FIELD_CARE = 4;
 
-// Structs
-
-// One patient record (one line of the CSV file)
 struct Patient {
     string id;
     int age;
     string careType;
-    int careNumber;        // position of careType in the careTypes list (0-5)
-    int lengthOfStay;      // visit duration in hours
+    int careNumber;        // index in careTypes (0-5)
+    int lengthOfStay;      // hours
     double costPerHour;    // MYR
     int visitsPerYear;
-    double totalCost;      // lengthOfStay x costPerHour x visitsPerYear
+    double totalCost;
 };
 
-// What we are searching for:
-// a patient matches when  low <= value of field <= high
 struct SearchQuery {
-    int field;              // FIELD_AGE, FIELD_STAY or FIELD_CARE
+    int field;
     double low;
     double high;
-    string description;     // text shown on screen, e.g. "Age 61-100"
+    string description;
 };
 
-// Helper functions
-// Returns the age group (0-4) for an age, or -1 if not in any group
+// Returns age group index (0-4), or -1 if invalid
 int getAgeGroup(int age) {
     for (int i = 0; i < NUM_AGE_GROUPS; i++) {
         if (age >= ageGroupMin[i] && age <= ageGroupMax[i]) {
@@ -84,17 +73,14 @@ int getAgeGroup(int age) {
     return -1;
 }
 
-// Returns the age range of a group, e.g. "18-25"
 string getAgeRange(int group) {
     return to_string(ageGroupMin[group]) + "-" + to_string(ageGroupMax[group]);
 }
 
-// Returns the full name of a group, e.g. "18-25 Young Adults / University Students"
 string getAgeGroupName(int group) {
     return getAgeRange(group) + " " + ageGroupLabels[group];
 }
 
-// Returns the position of a care type in the careTypes list, or -1 if not found
 int getCareNumber(string careType) {
     for (int i = 0; i < NUM_CARE_TYPES; i++) {
         if (careTypes[i] == careType) {
@@ -104,12 +90,11 @@ int getCareNumber(string careType) {
     return -1;
 }
 
-// Returns the value of the field we want to sort or search by
 double getValue(const Patient &p, int field) {
     if (field == FIELD_AGE) return p.age;
     if (field == FIELD_STAY) return p.lengthOfStay;
     if (field == FIELD_COST) return p.totalCost;
-    return p.careNumber;   // FIELD_CARE
+    return p.careNumber;
 }
 
 string getFieldName(int field) {
@@ -119,16 +104,13 @@ string getFieldName(int field) {
     return "Care type";
 }
 
-// Removes the Windows line ending (\r) at the end of a line, if there is one
 void removeLineEnding(string &line) {
     if (line.length() > 0 && line[line.length() - 1] == '\r') {
         line.erase(line.length() - 1);
     }
 }
 
-// Turns one CSV line into a Patient.
-// Example line: PT1001,42,Emergency,12,150.0,2
-// Returns false if a value is missing or the care type / age is not valid.
+// Parse one line from CSV
 bool readPatientLine(string line, Patient &p) {
     stringstream ss(line);
     string id, age, care, stay, rate, visits;
@@ -141,7 +123,7 @@ bool readPatientLine(string line, Patient &p) {
 
     p.id = id;
     if (age == "" || stay == "" || rate == "" || visits == "") {
-        return false;   // a value is missing, so we cannot use this line
+        return false;
     }
 
     p.age = stoi(age);
@@ -158,20 +140,16 @@ bool readPatientLine(string line, Patient &p) {
     return true;
 }
 
-// Printing
-
-// Turns an amount into money text with 2 decimals and commas,
-// e.g. 2500 becomes "2,500.00". (Amounts in this system are never negative.)
+// Format double to currency string with 2 decimals and commas
 string formatMoney(double amount) {
     stringstream ss;
     ss << fixed << setprecision(2) << amount;
-    string text = ss.str();               // e.g. "2322210.00"
+    string text = ss.str();
     int dotPosition = text.find('.');
-    // put a comma every 3 digits, going left from the decimal point
     for (int i = dotPosition - 3; i > 0; i = i - 3) {
         text.insert(i, ",");
     }
-    return text;                          // e.g. "2,322,210.00"
+    return text;
 }
 
 void printLine(int length) {

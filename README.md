@@ -1,150 +1,80 @@
-# 🏥 Hospital Patient Management System: Array vs. Singly Linked List
+# Hospital Patient Management System
 
-[![Language](https://img.shields.io/badge/Language-C%2B%2B17-blue.svg)](https://en.cppreference.com/w/cpp/17)
-[![Compiler](https://img.shields.io/badge/Compiler-GCC%20%2F%20MinGW-orange.svg)](https://gcc.gnu.org/)
-[![IDE](https://img.shields.io/badge/IDE-VS%20Code-007ACC.svg)](https://code.visualstudio.com/)
+This project is a C++ study comparing two data structures—Fixed-size Array and Singly Linked List—for managing patient records across three hospital facilities.
 
-A comprehensive C++ comparative data structures study implementing a **Hospital Patient Management and Billing System**. The system evaluates performance, memory overhead, and algorithmic behavior across two distinct core data structures: **Fixed-size Arrays** vs. **Singly Linked Lists**.
+The system implements patient record viewing, billing calculations, sorting, searching, and performance timing to compare how arrays and linked lists perform in practice.
 
 ---
 
-## 📋 Overview
+## Project Structure
 
-Modern healthcare facilities handle diverse patient demographics, clinical records, and billing transactions. This project implements identical administrative, analytical, and clinical features on both:
-1. **Array-based Implementation (`array_program.cpp`)**
-2. **Singly Linked List-based Implementation (`linked_list_program.cpp`)**
-
-It enables empirical performance testing to measure and compare real-world execution times ($\mu s$), comparison counts, dynamic memory overhead, and theoretical Big-O time complexities.
+- `patient.hpp`: Patient structure, search query definitions, CSV reading, and display helpers.
+- `timer.hpp`: Timer helper using std::chrono to measure execution time in microseconds.
+- `menu.hpp`: Console input validation and menu navigation.
+- `report.hpp`: Demographic breakdown, expenditure calculations, and recommendations.
+- `array.hpp`: Array implementation of Insertion Sort, Linear Search, and Binary Search.
+- `array_program.cpp`: Main driver program for the array version.
+- `linked_list.hpp`: Singly linked list implementation of Bubble Sort and Linear Search.
+- `linked_list_program.cpp`: Main driver program for the linked list version.
+- `data/`: CSV datasets for Facility A, Facility B, and Facility C (200 records each).
 
 ---
 
-## 📂 Project Structure
+## Features
 
-```text
-hospital_project/
-├── data/
-│   ├── dataset1_facility_a.csv     # 200 patient records (Facility A)
-│   ├── dataset2_facility_b.csv     # 200 patient records (Facility B)
-│   └── dataset3_facility_c.csv     # 200 patient records (Facility C)
-├── .vscode/
-│   ├── launch.json                 # GDB debug configurations
-│   ├── tasks.json                  # Automated build & run tasks
-│   ├── settings.json               # C++17 standard settings
-│   └── extensions.json             # Recommended extensions
-├── array.hpp                       # Array algorithms (Insertion Sort, Linear & Binary Search)
-├── array_program.cpp               # Array application driver & CLI menu
-├── linked_list.hpp                 # Linked List algorithms (Bubble Sort, Linear Search, Node ops)
-├── linked_list_program.cpp         # Linked List application driver & CLI menu
-├── patient.hpp                     # Patient, SearchQuery structs, CSV parsing, print helpers
-├── report.hpp                      # Demographic & expenditure reporting logic
-├── menu.hpp                        # Interactive console UI and input validators
-├── timer.hpp                       # High-resolution microsecond benchmarking timer
-├── .gitignore                      # Git ignore rules for binaries and object files
-├── README.md                       # Project documentation
-└── README.txt                      # Original project brief notes
+1. **View Patient Records**: Displays formatted patient records (ID, age, age group, care type, stay duration, cost per hour, visits per year, total cost).
+2. **Billing and Demographic Reports**:
+   - Patient breakdown by age group and care type.
+   - Facility expenditure summary and comparison across facilities.
+   - Healthcare resource allocation recommendations based on data.
+3. **Sorting**:
+   - Array: Insertion Sort.
+   - Linked List: Bubble Sort.
+   - Sortable fields: Age, Visit Duration, Total Cost, Care Type.
+   - Always sorts on a copy to preserve original dataset order.
+4. **Searching**:
+   - Linear search on unsorted data.
+   - Binary search on sorted array / Early-stop linear search on sorted linked list.
+   - Search filters: Age Group, Care Type, Visit Duration (> X hours).
+5. **Performance Testing**:
+   - Measures average execution time over 100 runs.
+   - Tracks comparison counts, swaps/shifts, and memory usage.
+
+---
+
+## How to Compile and Run
+
+Make sure you are in the project folder containing the `data/` directory.
+
+### Compile using GCC / MinGW:
+
+```cmd
+g++ -std=c++17 array_program.cpp -o array_program.exe
+g++ -std=c++17 linked_list_program.cpp -o linked_list_program.exe
 ```
 
----
+### Run the programs:
 
-## ⚡ Algorithms & Complexity Analysis
-
-| Operation | Array Implementation | Linked List Implementation | Notes |
-| :--- | :--- | :--- | :--- |
-| **Sorting** | **Insertion Sort**<br>Best: $O(n)$<br>Avg/Worst: $O(n^2)$ | **Bubble Sort**<br>Best: $O(n)$<br>Avg/Worst: $O(n^2)$ | Swaps patient data in adjacent nodes; both sorts operate in $O(1)$ auxiliary space. |
-| **Unsorted Search** | **Linear Search**<br>$O(n)$ | **Linear Search**<br>$O(n)$ | Sequential traversal across datasets. |
-| **Sorted Search** | **Binary Search**<br>$O(\log n) + O(k)$ matches | **Early-Exit Linear Search**<br>$O(n)$ | Linked lists cannot perform $O(\log n)$ random indexing. |
-| **Random Access** | $O(1)$ via index | $O(n)$ pointer traversal | Array supports direct indexing. |
-| **Memory Overhead** | $O(1)$ overhead | $O(n)$ pointer overhead | Linked list requires pointer per node (`Node* next`). |
-
----
-
-## 💡 Core Features
-
-### 1. Patient Record Viewing & Categorization
-- Tabular display of patient ID, demographics, admission duration, facility, and age group (Children, Youth, Adult, Senior).
-
-### 2. Billing & Demographic Reports
-- **Patient Demographic & Billing Categorization**: Summary tables broken down per age group across Facility A, B, C, or combined facilities.
-- **Healthcare Expenditure & Service Analysis**: Inpatient vs. Outpatient cost metrics and service breakdown.
-- **Clinical Insights & Recommendations**: Tailored healthcare resource allocation insights.
-- **Full Consolidated Report**: Single-command comprehensive report generation.
-
-$$\text{Total Cost} = \text{LengthOfStay} \times \text{BaseCostPerHour} \times \text{DaysVisitsPerYear}$$
-
-### 3. Multi-Field Sorting
-- Sort records dynamically by:
-  - **Age**
-  - **Visit Duration (Length of Stay)**
-  - **Total Cost**
-  - **Care Type**
-- Sorting operates safely on data copies, preserving the original order.
-
-### 4. Search & Filtering
-- Search records on unsorted or sorted data:
-  - By Age Group
-  - By Care Type
-  - By Visit Duration exceeding $X$ hours
-
-### 5. Automated Performance Benchmarking
-- Runs multi-iteration benchmarks (100 runs per test) to measure:
-  - Microsecond execution time ($\mu s$)
-  - Total algorithmic comparison counts
-  - Heap and stack memory utilization
-  - Big-O analysis comparison
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- **GCC / G++ Compiler** (supporting C++17 or higher, e.g., MinGW-w64 on Windows, GCC on Linux/macOS)
-- **VS Code** (Optional, recommended for integrated build tasks)
-
-### Compiling via Terminal
-
-Navigate to the project root directory:
-
-```bash
-# Compile Array Program
-g++ -std=c++17 -O2 array_program.cpp -o array_program
-
-# Compile Linked List Program
-g++ -std=c++17 -O2 linked_list_program.cpp -o linked_list_program
-```
-
-### Running the Programs
-
-> [!NOTE]
-> Ensure programs are executed from the project root folder so the relative path to `data/` is resolved.
-
-**Windows:**
-```powershell
+```cmd
 .\array_program.exe
-# or
 .\linked_list_program.exe
 ```
 
-**Linux / macOS:**
-```bash
-./array_program
-# or
-./linked_list_program
-```
-
-### Running via VS Code
-1. Open the project folder in VS Code (`File > Open Folder`).
-2. Press `Ctrl+Shift+B` or go to **Terminal > Run Task...**:
-   - Select **`Run Array program`**
-   - Or select **`Run Singly linked-list program`**
-3. Alternatively, press `F5` to run with the GDB debugger attached.
+### VS Code:
+You can also use VS Code's Terminal > Run Task:
+- "Run Array program"
+- "Run Singly linked-list program"
 
 ---
 
-## 📊 Datasets
+## Algorithmic Summary
 
-Located in the `data/` directory:
-- `dataset1_facility_a.csv`: 200 patient records from Facility A
-- `dataset2_facility_b.csv`: 200 patient records from Facility B
-- `dataset3_facility_c.csv`: 200 patient records from Facility C
-
-Data fields include `PatientID`, `Name`, `Age`, `Gender`, `CareType`, `LengthOfStay`, `BaseCostPerHour`, and `DaysVisitsPerYear`.
+- **Array**:
+  - Insertion Sort: Best O(n), Worst O(n^2), Space O(1)
+  - Linear Search: O(n)
+  - Binary Search: O(log n) + O(k) matches (requires sorted data)
+- **Singly Linked List**:
+  - Bubble Sort: Best O(n), Worst O(n^2), Space O(1)
+  - Linear Search: O(n)
+  - Sorted Linear Search: O(n), with early-stop optimization
+  - (Binary Search is not practical on singly linked lists due to lack of random access)

@@ -4,9 +4,8 @@
 #include "patient.hpp"
 #include <fstream>
 
-const int MAX_PATIENTS = 500;   // maximum patients one facility can hold
+const int MAX_PATIENTS = 500;
 
-// Load patients from a CSV file into an array
 bool loadFile(string fileName, Patient arr[], int &count) {
     ifstream file(fileName);
     if (!file) {
@@ -15,27 +14,25 @@ bool loadFile(string fileName, Patient arr[], int &count) {
     }
 
     string line;
-    getline(file, line);   // skip the header line
+    getline(file, line); // header line
     count = 0;
 
     while (getline(file, line)) {
         removeLineEnding(line);
         if (line == "") {
-            continue;   // skip empty lines
+            continue;
         }
         if (count >= MAX_PATIENTS) {
-            cout << "Warning: " << fileName << " has more than " << MAX_PATIENTS
-                 << " patients. Extra patients were not loaded.\n";
+            cout << "Warning: " << fileName << " exceeds limit of " << MAX_PATIENTS << " records.\n";
             break;
         }
 
         Patient p;
         if (!readPatientLine(line, p)) {
-            cout << "Warning: skipped patient " << p.id << " (missing or invalid value).\n";
             continue;
         }
 
-        arr[count] = p;   // put the patient in the next free place
+        arr[count] = p;
         count++;
     }
 
@@ -43,7 +40,6 @@ bool loadFile(string fileName, Patient arr[], int &count) {
     return true;
 }
 
-// Display patients (limit 0 = show all)
 void displayPatients(Patient arr[], int count, int limit) {
     if (limit == 0 || limit > count) {
         limit = count;
@@ -56,16 +52,13 @@ void displayPatients(Patient arr[], int count, int limit) {
     cout << "Showing " << limit << " of " << count << " patients.\n";
 }
 
-// Copy one array into another (so we can sort a copy and keep the original order)
 void copyArray(Patient source[], Patient destination[], int count) {
     for (int i = 0; i < count; i++) {
         destination[i] = source[i];
     }
 }
 
-// INSERTION SORT (ascending)
-// Takes each patient and shifts the bigger ones to the right
-// until the correct place for that patient is found.
+// Insertion Sort (ascending)
 void insertionSort(Patient arr[], int count, int field, int &comparisons, int &shifts) {
     for (int i = 1; i < count; i++) {
         Patient current = arr[i];
@@ -74,21 +67,18 @@ void insertionSort(Patient arr[], int count, int field, int &comparisons, int &s
         while (j >= 0) {
             comparisons++;
             if (getValue(arr[j], field) > getValue(current, field)) {
-                arr[j + 1] = arr[j];   // shift bigger patient one place right
+                arr[j + 1] = arr[j];
                 shifts++;
                 j--;
             } else {
                 break;
             }
         }
-        arr[j + 1] = current;   // put the patient in its correct place
+        arr[j + 1] = current;
     }
 }
 
-// LINEAR SEARCH (works on unsorted data)
-// Checks every patient one by one.
-// Returns the number of matches. Prints them if show is true.
-// checks counts how many patients were looked at.
+// Linear Search
 int linearSearch(Patient arr[], int count, const SearchQuery &query, bool show, int &checks) {
     int matches = 0;
     for (int i = 0; i < count; i++) {
@@ -102,35 +92,32 @@ int linearSearch(Patient arr[], int count, const SearchQuery &query, bool show, 
     return matches;
 }
 
-// BINARY SEARCH (array must already be sorted by the same field)
-// Step 1: binary search to find any one patient inside the range
-// Step 2: move left to the first patient inside the range
-// Step 3: move right and collect every patient inside the range
+// Binary Search (range query on sorted array)
 int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, int &checks) {
     int left = 0;
     int right = count - 1;
     int found = -1;
 
-    // Step 1
+    // Find any match in range
     while (left <= right) {
         int mid = (left + right) / 2;
         double value = getValue(arr[mid], query.field);
         checks++;
         if (value < query.low) {
-            left = mid + 1;        // answer is on the right side
+            left = mid + 1;
         } else if (value > query.high) {
-            right = mid - 1;       // answer is on the left side
+            right = mid - 1;
         } else {
-            found = mid;           // this patient is inside the range
+            found = mid;
             break;
         }
     }
 
     if (found == -1) {
-        return 0;   // no match
+        return 0;
     }
 
-    // Step 2
+    // Move to first matching element
     int first = found;
     while (first > 0) {
         checks++;
@@ -141,12 +128,12 @@ int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, 
         }
     }
 
-    // Step 3
+    // Collect all elements within range
     int matches = 0;
     for (int i = first; i < count; i++) {
         checks++;
         if (getValue(arr[i], query.field) > query.high) {
-            break;   // sorted, so nothing after this can match
+            break;
         }
         matches++;
         if (show) printPatient(arr[i]);

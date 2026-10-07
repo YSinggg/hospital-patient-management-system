@@ -4,28 +4,25 @@
 #include "patient.hpp"
 #include "menu.hpp"
 
-// Totals for ONE facility (or for all facilities added together)
+// Summary totals for one facility (or combined facilities)
 struct FacilityStats {
     int patients;
     double totalCost;
-    int totalStay;                                        // total hours of all patients
-    int longStays;                                        // stays more than 24 hours
+    int totalStay;
+    int longStays;
 
-    int ageCount[NUM_AGE_GROUPS];                         // patients in each age group
-    double ageCost[NUM_AGE_GROUPS];                       // total cost of each age group
-    int ageStay[NUM_AGE_GROUPS];                          // total hours of each age group
+    int ageCount[NUM_AGE_GROUPS];
+    double ageCost[NUM_AGE_GROUPS];
+    int ageStay[NUM_AGE_GROUPS];
 
-    int careCount[NUM_CARE_TYPES];                        // patients in each care type
-    double careCost[NUM_CARE_TYPES];                      // total cost of each care type
-    int careStay[NUM_CARE_TYPES];                         // total hours of each care type
+    int careCount[NUM_CARE_TYPES];
+    double careCost[NUM_CARE_TYPES];
+    int careStay[NUM_CARE_TYPES];
 
-    int careByAge[NUM_AGE_GROUPS][NUM_CARE_TYPES];        // patients per care type in each age group
-    double careCostByAge[NUM_AGE_GROUPS][NUM_CARE_TYPES]; // cost per care type in each age group
+    int careByAge[NUM_AGE_GROUPS][NUM_CARE_TYPES];
+    double careCostByAge[NUM_AGE_GROUPS][NUM_CARE_TYPES];
 };
 
-// Filling in the totals
-
-// Set every total back to 0
 void resetStats(FacilityStats &stats) {
     stats.patients = 0;
     stats.totalCost = 0;
@@ -47,7 +44,6 @@ void resetStats(FacilityStats &stats) {
     }
 }
 
-// Add one patient to the totals
 void addPatientToStats(FacilityStats &stats, const Patient &p) {
     int group = getAgeGroup(p.age);
     int care = p.careNumber;
@@ -69,7 +65,6 @@ void addPatientToStats(FacilityStats &stats, const Patient &p) {
     stats.careCostByAge[group][care] += p.totalCost;
 }
 
-// Add all the totals of one facility into "total" (used to get ALL FACILITIES)
 void addStats(FacilityStats &total, const FacilityStats &stats) {
     total.patients += stats.patients;
     total.totalCost += stats.totalCost;
@@ -91,9 +86,6 @@ void addStats(FacilityStats &total, const FacilityStats &stats) {
     }
 }
 
-// Small printing helpers
-
-// Prints the average money amount (total / count), or N/A if count is 0
 void printAverageMoney(double total, int count, int width) {
     if (count > 0) {
         cout << setw(width) << formatMoney(total / count);
@@ -102,7 +94,6 @@ void printAverageMoney(double total, int count, int width) {
     }
 }
 
-// Prints the average number of hours (total / count), or N/A if count is 0
 void printAverageHours(double total, int count, int width) {
     if (count > 0) {
         cout << setw(width) << fixed << setprecision(2) << total / count;
@@ -111,9 +102,6 @@ void printAverageHours(double total, int count, int width) {
     }
 }
 
-// Returns the care type with the most patients, e.g. "Outpatient (36)".
-// unit is added after the number, e.g. " patients" gives "Outpatient (36 patients)".
-// If two care types have the same number, both are shown.
 string mostRequestedCare(const int counts[], string unit) {
     int most = 0;
     for (int care = 0; care < NUM_CARE_TYPES; care++) {
@@ -132,7 +120,6 @@ string mostRequestedCare(const int counts[], string unit) {
     return result + " (" + to_string(most) + unit + ")";
 }
 
-// Header for the tables that compare Facility A, B and C side by side
 void printCompareHeader(string firstColumn) {
     printLine(110);
     cout << left << setw(42) << firstColumn << right << setw(17) << "Facility A"
@@ -140,10 +127,7 @@ void printCompareHeader(string firstColumn) {
     printLine(110);
 }
 
-// SECTION 4: PATIENT DEMOGRAPHIC & BILLING CATEGORIZATION
-
-// One age group, in the same layout as the sample table in the brief.
-// Care types are listed from the most patients to the fewest.
+// Display table for a specific age group
 void printAgeGroupTable(const FacilityStats &stats, int group) {
     cout << "\nAge Group " << getAgeRange(group) << ": " << ageGroupLabels[group] << endl;
     printLine(92);
@@ -157,9 +141,8 @@ void printAgeGroupTable(const FacilityStats &stats, int group) {
         return;
     }
 
-    bool printed[NUM_CARE_TYPES] = {false};   // which care types are already printed
+    bool printed[NUM_CARE_TYPES] = {false};
     for (int row = 0; row < NUM_CARE_TYPES; row++) {
-        // find the care type with the most patients that is not printed yet
         int best = -1;
         for (int care = 0; care < NUM_CARE_TYPES; care++) {
             if (!printed[care] && stats.careByAge[group][care] > 0) {
@@ -169,7 +152,7 @@ void printAgeGroupTable(const FacilityStats &stats, int group) {
             }
         }
         if (best == -1) {
-            break;   // every care type with patients has been printed
+            break;
         }
         printed[best] = true;
 
@@ -186,11 +169,11 @@ void printAgeGroupTable(const FacilityStats &stats, int group) {
     cout << "Most Requested Care Type    : " << mostRequestedCare(stats.careByAge[group], " patients") << endl;
 }
 
-// Section 4 for one facility (or for all facilities together)
+// Patient demographic and billing categorization
 void printSection4(const FacilityStats &stats, string title) {
     cout << "\n=====================================================================\n";
-    cout << " 4. PATIENT DEMOGRAPHIC & BILLING CATEGORIZATION\n";
-    cout << "    " << title << endl;
+    cout << " PATIENT DEMOGRAPHIC & BILLING CATEGORIZATION\n";
+    cout << " " << title << endl;
     cout << "=====================================================================\n";
     cout << "Cost = Length of Stay x Base Cost Per Hour x Days Visits Per Year\n";
     cout << "Average Cost = Total Medical Cost in Age Group / Number of Patients in Age Group\n";
@@ -219,9 +202,7 @@ void printSection4(const FacilityStats &stats, string title) {
     }
 }
 
-// SECTION 5: HEALTHCARE EXPENDITURE & SERVICE ANALYSIS
-
-// One row of the 5a table
+// Healthcare expenditure and service analysis
 void printBillingRow(string name, const FacilityStats &stats) {
     cout << left << setw(42) << name << right << setw(10) << stats.patients
          << setw(20) << formatMoney(stats.totalCost);
@@ -233,11 +214,10 @@ void printBillingRow(string name, const FacilityStats &stats) {
 
 void printSection5(FacilityStats stats[], const FacilityStats &all) {
     cout << "\n=====================================================================\n";
-    cout << " 5. HEALTHCARE EXPENDITURE & SERVICE ANALYSIS\n";
+    cout << " HEALTHCARE EXPENDITURE & SERVICE ANALYSIS\n";
     cout << "=====================================================================\n";
 
-    // ---- 5a: total billing per dataset ----
-    cout << "\n5a. Total medical billing per dataset\n";
+    cout << "\nTotal medical billing per facility\n";
     printLine(128);
     cout << left << setw(42) << "Facility" << right << setw(10) << "Patients"
          << setw(20) << "Total Cost (MYR)" << setw(20) << "Avg Cost (MYR)"
@@ -249,8 +229,7 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
     printLine(128);
     printBillingRow("ALL FACILITIES", all);
 
-    // ---- 5b: total cost grouped by care type ----
-    cout << "\n5b. Total medical cost (MYR) by care type\n";
+    cout << "\nTotal medical cost (MYR) by care type\n";
     printCompareHeader("Care Type");
     for (int care = 0; care < NUM_CARE_TYPES; care++) {
         cout << left << setw(42) << careTypes[care] << right;
@@ -266,8 +245,7 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
     }
     cout << setw(17) << formatMoney(all.totalCost) << endl;
 
-    // ---- 5c: compare expenditure and visit durations across datasets and age groups ----
-    cout << "\n5c. Total medical cost (MYR) by age group\n";
+    cout << "\nTotal medical cost (MYR) by age group\n";
     printCompareHeader("Age Group");
     for (int group = 0; group < NUM_AGE_GROUPS; group++) {
         cout << left << setw(42) << getAgeGroupName(group) << right;
@@ -277,7 +255,7 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
         cout << setw(17) << formatMoney(all.ageCost[group]) << endl;
     }
 
-    cout << "\n5c. Average cost per patient (MYR) by age group\n";
+    cout << "\nAverage cost per patient (MYR) by age group\n";
     printCompareHeader("Age Group");
     for (int group = 0; group < NUM_AGE_GROUPS; group++) {
         cout << left << setw(42) << getAgeGroupName(group) << right;
@@ -288,7 +266,7 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
         cout << endl;
     }
 
-    cout << "\n5c. Average visit duration (hours) by age group\n";
+    cout << "\nAverage visit duration (hours) by age group\n";
     printCompareHeader("Age Group");
     for (int group = 0; group < NUM_AGE_GROUPS; group++) {
         cout << left << setw(42) << getAgeGroupName(group) << right;
@@ -299,7 +277,7 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
         cout << endl;
     }
 
-    cout << "\n5c. Average visit duration (hours) by care type\n";
+    cout << "\nAverage visit duration (hours) by care type\n";
     printCompareHeader("Care Type");
     for (int care = 0; care < NUM_CARE_TYPES; care++) {
         cout << left << setw(42) << careTypes[care] << right;
@@ -312,16 +290,13 @@ void printSection5(FacilityStats stats[], const FacilityStats &all) {
     cout << "N/A = the facility has no patients in that group.\n";
 }
 
-// ============================================================
-// SECTION 9: CLINICAL INSIGHTS AND RECOMMENDATIONS
-// ============================================================
+// Clinical insights and recommendations
 void printSection9(FacilityStats stats[], const FacilityStats &all) {
     cout << "\n=====================================================================\n";
-    cout << " 9. CLINICAL INSIGHTS AND RECOMMENDATIONS\n";
+    cout << " CLINICAL INSIGHTS AND RECOMMENDATIONS\n";
     cout << "=====================================================================\n";
 
-    // ---- 9a: treatment costs and service preferences across datasets and age groups ----
-    cout << "\n9a. Service preference: number of patients by care type\n";
+    cout << "\nService preference: patient count by care type\n";
     printCompareHeader("Care Type");
     for (int care = 0; care < NUM_CARE_TYPES; care++) {
         cout << left << setw(42) << careTypes[care] << right;
@@ -337,7 +312,7 @@ void printSection9(FacilityStats stats[], const FacilityStats &all) {
     }
     cout << setw(17) << all.patients << endl;
 
-    cout << "\n9a. Treatment cost: average cost per patient (MYR) by care type\n";
+    cout << "\nTreatment cost: average cost per patient (MYR) by care type\n";
     printCompareHeader("Care Type");
     for (int care = 0; care < NUM_CARE_TYPES; care++) {
         cout << left << setw(42) << careTypes[care] << right;
@@ -348,7 +323,7 @@ void printSection9(FacilityStats stats[], const FacilityStats &all) {
         cout << endl;
     }
 
-    cout << "\n9a. Service preference: most requested care type by age group (number of patients)\n";
+    cout << "\nMost requested care type by age group\n";
     printLine(130);
     cout << left << setw(42) << "Age Group" << setw(22) << "Facility A" << setw(22) << "Facility B"
          << setw(22) << "Facility C" << setw(22) << "All Facilities" << endl;
@@ -362,7 +337,6 @@ void printSection9(FacilityStats stats[], const FacilityStats &all) {
     }
     printLine(130);
 
-    // ---- 9b: highest billing demographic and highest patient traffic ----
     int costliestAge = 0;
     int highestAvgAge = 0;
     double highestAvg = 0;
@@ -386,7 +360,7 @@ void printSection9(FacilityStats stats[], const FacilityStats &all) {
         if (stats[facility].longStays > stats[mostLongStays].longStays) mostLongStays = facility;
     }
 
-    cout << "\n9b. Highest billing and highest patient traffic (all facilities)\n";
+    cout << "\nHighest billing demographic and patient traffic summary\n";
     printLine(110);
     cout << "Age group with highest total billing  : " << getAgeGroupName(costliestAge)
          << " (MYR " << formatMoney(all.ageCost[costliestAge]) << ")\n";
@@ -407,21 +381,18 @@ void printSection9(FacilityStats stats[], const FacilityStats &all) {
     }
     printLine(110);
 
-    // ---- 9c: recommendations ----
-    cout << "\n9c. Recommendations for hospital administrators\n";
-    cout << "1. " << careTypes[busiestCare] << " has the most patients. Add more registration counters,\n"
-         << "   staff and appointment slots for this care type to shorten queues.\n";
-    cout << "2. The " << getAgeGroupName(costliestAge) << " group produces the highest bill.\n"
-         << "   Plan more beds, specialist staff and follow-up care for this age group.\n";
-    cout << "3. " << facilityNames[mostLongStays] << " has the most stays over 24 hours.\n";
-    cout << "4. Each facility should put more staff on its own busiest care type (see above),\n"
-         << "   because each facility serves a different age group and care mix.\n";
+    cout << "\nRecommendations for hospital resource planning\n";
+    cout << "1. " << careTypes[busiestCare] << " recorded highest patient volume. Consider allocating\n"
+         << "   more counters and dedicated staff to reduce waiting time.\n";
+    cout << "2. " << getAgeGroupName(costliestAge) << " incurs the highest total billing.\n"
+         << "   Budget more specialized equipment and bed capacity for this demographic.\n";
+    cout << "3. " << facilityNames[mostLongStays] << " has the highest number of extended stays (> 24 hours).\n"
+         << "   Review admission criteria and bed turnover management to optimize capacity.\n";
+    cout << "4. Facility-specific staffing should align with respective peak care types,\n"
+         << "   as patient demand varies across each location.\n";
 }
 
-// Report menu
-// stats has one FacilityStats for each facility (already filled in)
 void reportMenu(FacilityStats stats[]) {
-    // Add the three facilities together to get ALL FACILITIES
     FacilityStats all;
     resetStats(all);
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {

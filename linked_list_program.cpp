@@ -1,11 +1,4 @@
-// ============================================================
-//  Smart Healthcare & Hospital Patient Management System
-//  SINGLY LINKED LIST VERSION  (main program)
-//
-//  Sorting   : Bubble Sort                         (in linked_list.hpp)
-//  Searching : Linear Search on unsorted list      (in linked_list.hpp)
-//              Linear Search with early stop       (in linked_list.hpp)
-// ============================================================
+// Hospital Patient Management System - Singly Linked List Version
 
 #include "patient.hpp"
 #include "timer.hpp"
@@ -16,9 +9,7 @@
 // One linked list for each facility
 LinkedList lists[NUM_FACILITIES];
 
-// ------------------------------------------------------------
-// Menu option 1: view patients
-// ------------------------------------------------------------
+// 1. View patients
 void viewPatients() {
     int facility = chooseFacility();
     int limit = readNumber("How many patients to show? (0 = all): ", 0, 100000);
@@ -26,13 +17,10 @@ void viewPatients() {
     displayList(lists[facility], limit);
 }
 
-// ------------------------------------------------------------
-// Menu option 2: billing and demographic report
-// ------------------------------------------------------------
+// 2. Billing and demographic report
 void showReport() {
     FacilityStats stats[NUM_FACILITIES];
 
-    // go through every node in each list and add the patient to the totals
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         resetStats(stats[facility]);
         Node* current = lists[facility].head;
@@ -44,16 +32,14 @@ void showReport() {
     reportMenu(stats);
 }
 
-// ------------------------------------------------------------
-// Menu option 3: sort patients
-// ------------------------------------------------------------
+// 3. Sort patients
 void sortPatients() {
     int facility = chooseFacility();
     int field = chooseField();
     int limit = readNumber("How many patients to show? (0 = all): ", 0, 100000);
     int count = lists[facility].count;
 
-    // sort a copy so the original order stays the same
+    // Sort a copy to preserve original order
     LinkedList sorted;
     copyList(lists[facility], sorted);
 
@@ -72,12 +58,10 @@ void sortPatients() {
          << count << " x " << sizeof(Node) << ") + " << sizeof(Patient)
          << " bytes extra (one temporary Patient)\n";
 
-    deleteList(sorted);   // free the copy
+    deleteList(sorted);
 }
 
-// ------------------------------------------------------------
-// Menu option 4: search patients
-// ------------------------------------------------------------
+// 4. Search patients
 void searchPatients() {
     int facility = chooseFacility();
     SearchQuery query = chooseSearch();
@@ -90,8 +74,7 @@ void searchPatients() {
     double searchTime = 0;
 
     if (method == 1) {
-        // Run once without printing to measure the time fairly
-        // (printing is slow), then run again to show the results.
+        // Measure search time without I/O display overhead
         double start = getTimeNow();
         matches = linearSearch(lists[facility], query, false, false, checks);
         searchTime = getTimeNow() - start;
@@ -100,7 +83,7 @@ void searchPatients() {
         printPatientHeader();
         linearSearch(lists[facility], query, false, true, unused);
     } else {
-        // Sort a copy first, so the search can stop early
+        // Sort a copy first for early stop search
         LinkedList sorted;
         copyList(lists[facility], sorted);
 
@@ -119,7 +102,7 @@ void searchPatients() {
         printPatientHeader();
         linearSearch(sorted, query, true, true, unused);
 
-        deleteList(sorted);   // free the copy
+        deleteList(sorted);
     }
 
     printLine(PATIENT_TABLE_WIDTH);
@@ -130,12 +113,7 @@ void searchPatients() {
          << count << " x " << sizeof(Node) << "), no extra memory needed by the search\n";
 }
 
-// ------------------------------------------------------------
-// Menu option 5: performance test
-// Every test is repeated RUNS times and the average time is shown.
-// ------------------------------------------------------------
-
-// Prints one row of the performance table
+// 5. Performance test
 void printPerformanceRow(int facility, string operation, string test, double averageTime,
                          int comparisons, string swaps, string matches, int extraMemory) {
     cout << left << setw(10) << facilityLetters[facility] << setw(28) << operation
@@ -144,14 +122,13 @@ void printPerformanceRow(int facility, string operation, string test, double ave
          << setw(14) << extraMemory << endl;
 }
 
-// Times bubble sort on one facility, sorted by one field
 void testBubbleSort(int facility, int field) {
     double totalTime = 0;
     int comparisons = 0, swaps = 0;
 
     for (int run = 0; run < RUNS; run++) {
         LinkedList temp;
-        copyList(lists[facility], temp);   // start from the original order every time
+        copyList(lists[facility], temp);
         comparisons = 0;
         swaps = 0;
         double start = getTimeNow();
@@ -164,11 +141,10 @@ void testBubbleSort(int facility, int field) {
                         comparisons, to_string(swaps), "-", sizeof(Patient));
 }
 
-// Times linear search on the unsorted list and on a sorted list for one query
 void testSearch(int facility, const SearchQuery &query) {
     int checks = 0, matches = 0;
 
-    // 1. Linear search on the original unsorted list
+    // Linear search on unsorted list
     double totalTime = 0;
     for (int run = 0; run < RUNS; run++) {
         checks = 0;
@@ -179,7 +155,7 @@ void testSearch(int facility, const SearchQuery &query) {
     printPerformanceRow(facility, "Linear search (unsorted)", query.description, totalTime / RUNS,
                         checks, "-", to_string(matches), 0);
 
-    // 2. Linear search with early stop on a sorted copy (the sort is not timed here)
+    // Linear search with early stop on sorted list
     LinkedList sorted;
     int comparisons = 0, swaps = 0;
     copyList(lists[facility], sorted);
@@ -195,11 +171,11 @@ void testSearch(int facility, const SearchQuery &query) {
     printPerformanceRow(facility, "Linear search (sorted)", query.description, totalTime / RUNS,
                         checks, "-", to_string(matches), 0);
 
-    deleteList(sorted);   // free the copy
+    deleteList(sorted);
 }
 
 void printMemoryUsage() {
-    cout << "\nMEMORY (approximate)\n";
+    cout << "\nMEMORY USAGE\n";
     cout << "Size of one Patient            : " << sizeof(Patient) << " bytes\n";
     cout << "Size of one Node               : " << sizeof(Node) << " bytes (Patient + next pointer)\n";
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
@@ -209,7 +185,7 @@ void printMemoryUsage() {
     }
     cout << "Each node needs " << sizeof(Node) - sizeof(Patient)
          << " more bytes than an array element because of the next pointer.\n";
-    cout << "Note: sizes do not include extra memory used inside each string.\n";
+    cout << "Note: sizes do not include dynamic string buffer memory.\n";
 }
 
 void printComplexityTable() {
@@ -221,23 +197,23 @@ void printComplexityTable() {
     cout << left << setw(32) << "Bubble sort" << setw(20) << "O(n)" << setw(26) << "O(n^2)" << "O(1)" << endl;
     cout << left << setw(32) << "Linear search (unsorted)" << setw(20) << "O(n)" << setw(26) << "O(n)" << "O(1)" << endl;
     cout << left << setw(32) << "Linear search (sorted)" << setw(20) << "O(1) early stop" << setw(26) << "O(n)" << "O(1)" << endl;
-    cout << left << setw(32) << "Access patient number i" << setw(20) << "O(1) (first)" << setw(26) << "O(n) (walk from head)" << "-" << endl;
+    cout << left << setw(32) << "Access patient number i" << setw(20) << "O(1) (first)" << setw(26) << "O(n) (traverse)" << "-" << endl;
     cout << left << setw(32) << "Add patient at end" << setw(20) << "O(1) with tail" << setw(26) << "O(1) with tail" << "1 new node" << endl;
     printLine(100);
 }
 
 void performanceTest() {
-    // The three searches used for the test (same as the examples in the brief)
+    // Test search queries
     SearchQuery tests[3] = {
         {FIELD_AGE, 61, 100, "Age 61-100"},
-        {FIELD_CARE, 0, 0, "Care: Emergency"},           // 0 = Emergency in careTypes
-        {FIELD_STAY, 25, 1000000, "Duration > 24 hours"} // 25 or more = more than 24
+        {FIELD_CARE, 0, 0, "Care: Emergency"},
+        {FIELD_STAY, 25, 1000000, "Duration > 24 hours"}
     };
 
     cout << "\n========== PERFORMANCE TEST (SINGLY LINKED LIST) ==========\n";
     cout << "Each test is repeated " << RUNS << " times. Time is the average in microseconds.\n";
-    cout << "Sorted search time does NOT include the bubble sort done before it.\n";
-    cout << "Extra Mem = extra memory used by the algorithm on top of the linked list.\n";
+    cout << "Sorted search time does not include bubble sort.\n";
+    cout << "Extra Mem = auxiliary memory used by algorithm.\n";
     printLine(116);
     cout << left << setw(10) << "Facility" << setw(28) << "Operation" << setw(20) << "Field / Search"
          << right << setw(14) << "Avg Time (us)" << setw(14) << "Comparisons"
@@ -258,15 +234,11 @@ void performanceTest() {
     printComplexityTable();
 }
 
-// ------------------------------------------------------------
-// MAIN
-// ------------------------------------------------------------
 int main() {
     cout << "===================================================================\n";
     cout << "  HOSPITAL PATIENT MANAGEMENT SYSTEM (SINGLY LINKED LIST VERSION)\n";
     cout << "===================================================================\n";
 
-    // Load the three CSV files into the three linked lists
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         if (!loadFile(fileNames[facility], lists[facility])) {
             cout << "Make sure the data folder is in the same folder you run the program from.\n";
@@ -296,7 +268,6 @@ int main() {
         }
     } while (choice != 0);
 
-    // free all the lists before the program ends
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         deleteList(lists[facility]);
     }

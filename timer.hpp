@@ -4,11 +4,12 @@
 #include <chrono>
 using namespace std;
 
-const int RUNS = 100;   // how many times each test is repeated in the performance test
+const int RUNS = 100; // repeat count for performance benchmark
 
-// Returns the current time in microseconds (1 second = 1,000,000 microseconds).
+// Returns current time in microseconds
 double getTimeNow() {
-    return chrono::duration<double, micro>(chrono::steady_clock::now().time_since_epoch()).count();
+    auto now = chrono::high_resolution_clock::now();
+    return chrono::duration<double, micro>(now.time_since_epoch()).count();
 }
 
 #endif

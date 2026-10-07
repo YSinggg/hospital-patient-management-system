@@ -1,11 +1,4 @@
-// ============================================================
-//  Smart Healthcare & Hospital Patient Management System
-//  ARRAY VERSION  (main program)
-//
-//  Sorting   : Insertion Sort        (in array.hpp)
-//  Searching : Linear Search         (in array.hpp)
-//              Binary Search         (in array.hpp)
-// ============================================================
+// Hospital Patient Management System - Array Version
 
 #include "patient.hpp"
 #include "timer.hpp"
@@ -17,9 +10,7 @@
 Patient patients[NUM_FACILITIES][MAX_PATIENTS];
 int patientCount[NUM_FACILITIES];
 
-// ------------------------------------------------------------
-// Menu option 1: view patients
-// ------------------------------------------------------------
+// 1. View patients
 void viewPatients() {
     int facility = chooseFacility();
     int limit = readNumber("How many patients to show? (0 = all): ", 0, MAX_PATIENTS);
@@ -27,13 +18,10 @@ void viewPatients() {
     displayPatients(patients[facility], patientCount[facility], limit);
 }
 
-// ------------------------------------------------------------
-// Menu option 2: billing and demographic report
-// ------------------------------------------------------------
+// 2. Billing and demographic report
 void showReport() {
     FacilityStats stats[NUM_FACILITIES];
 
-    // go through every patient in each array and add them to the totals
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         resetStats(stats[facility]);
         for (int i = 0; i < patientCount[facility]; i++) {
@@ -43,16 +31,14 @@ void showReport() {
     reportMenu(stats);
 }
 
-// ------------------------------------------------------------
-// Menu option 3: sort patients
-// ------------------------------------------------------------
+// 3. Sort patients
 void sortPatients() {
     int facility = chooseFacility();
     int field = chooseField();
     int limit = readNumber("How many patients to show? (0 = all): ", 0, MAX_PATIENTS);
     int count = patientCount[facility];
 
-    // sort a copy so the original order stays the same
+    // Sort a copy to preserve original order
     Patient sorted[MAX_PATIENTS];
     copyArray(patients[facility], sorted, count);
 
@@ -71,9 +57,7 @@ void sortPatients() {
          << sizeof(Patient) << " bytes extra (one temporary Patient)\n";
 }
 
-// ------------------------------------------------------------
-// Menu option 4: search patients
-// ------------------------------------------------------------
+// 4. Search patients
 void searchPatients() {
     int facility = chooseFacility();
     SearchQuery query = chooseSearch();
@@ -86,8 +70,7 @@ void searchPatients() {
     double searchTime = 0;
 
     if (method == 1) {
-        // Run once without printing to measure the time fairly
-        // (printing is slow), then run again to show the results.
+        // Measure search time without I/O display overhead
         double start = getTimeNow();
         matches = linearSearch(patients[facility], count, query, false, checks);
         searchTime = getTimeNow() - start;
@@ -96,7 +79,7 @@ void searchPatients() {
         printPatientHeader();
         linearSearch(patients[facility], count, query, true, unused);
     } else {
-        // Binary search only works on sorted data, so sort a copy first
+        // Binary search requires sorted data
         Patient sorted[MAX_PATIENTS];
         copyArray(patients[facility], sorted, count);
 
@@ -124,12 +107,7 @@ void searchPatients() {
          << " bytes of patient data, no extra memory needed by the search\n";
 }
 
-// ------------------------------------------------------------
-// Menu option 5: performance test
-// Every test is repeated RUNS times and the average time is shown.
-// ------------------------------------------------------------
-
-// Prints one row of the performance table
+// 5. Performance test
 void printPerformanceRow(int facility, string operation, string test, double averageTime,
                          int comparisons, string shifts, string matches, int extraMemory) {
     cout << left << setw(10) << facilityLetters[facility] << setw(28) << operation
@@ -138,7 +116,6 @@ void printPerformanceRow(int facility, string operation, string test, double ave
          << setw(14) << extraMemory << endl;
 }
 
-// Times insertion sort on one facility, sorted by one field
 void testInsertionSort(int facility, int field) {
     Patient temp[MAX_PATIENTS];
     int count = patientCount[facility];
@@ -146,7 +123,7 @@ void testInsertionSort(int facility, int field) {
     int comparisons = 0, shifts = 0;
 
     for (int run = 0; run < RUNS; run++) {
-        copyArray(patients[facility], temp, count);   // start from the original order every time
+        copyArray(patients[facility], temp, count);
         comparisons = 0;
         shifts = 0;
         double start = getTimeNow();
@@ -158,12 +135,11 @@ void testInsertionSort(int facility, int field) {
                         comparisons, to_string(shifts), "-", sizeof(Patient));
 }
 
-// Times linear search (unsorted) and binary search (sorted) for one query
 void testSearch(int facility, const SearchQuery &query) {
     int count = patientCount[facility];
     int checks = 0, matches = 0;
 
-    // 1. Linear search on the original unsorted array
+    // Linear search on original unsorted array
     double totalTime = 0;
     for (int run = 0; run < RUNS; run++) {
         checks = 0;
@@ -174,7 +150,7 @@ void testSearch(int facility, const SearchQuery &query) {
     printPerformanceRow(facility, "Linear search (unsorted)", query.description, totalTime / RUNS,
                         checks, "-", to_string(matches), 0);
 
-    // 2. Binary search on a sorted copy (the sort is not timed here)
+    // Binary search on sorted copy
     Patient sorted[MAX_PATIENTS];
     int comparisons = 0, shifts = 0;
     copyArray(patients[facility], sorted, count);
@@ -192,16 +168,16 @@ void testSearch(int facility, const SearchQuery &query) {
 }
 
 void printMemoryUsage() {
-    cout << "\nMEMORY (approximate)\n";
+    cout << "\nMEMORY USAGE\n";
     cout << "Size of one Patient            : " << sizeof(Patient) << " bytes\n";
     cout << "Array size per facility        : " << MAX_PATIENTS << " places x " << sizeof(Patient)
-         << " = " << MAX_PATIENTS * sizeof(Patient) << " bytes (reserved even if not full)\n";
+         << " = " << MAX_PATIENTS * sizeof(Patient) << " bytes (fixed allocation)\n";
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         cout << "Facility " << facilityLetters[facility] << " actually uses       : "
              << patientCount[facility] << " x " << sizeof(Patient) << " = "
              << patientCount[facility] * sizeof(Patient) << " bytes\n";
     }
-    cout << "Note: sizes do not include extra memory used inside each string.\n";
+    cout << "Note: sizes do not include dynamic string buffer memory.\n";
 }
 
 void printComplexityTable() {
@@ -218,17 +194,17 @@ void printComplexityTable() {
 }
 
 void performanceTest() {
-    // The three searches used for the test (same as the examples in the brief)
+    // Test search queries
     SearchQuery tests[3] = {
         {FIELD_AGE, 61, 100, "Age 61-100"},
-        {FIELD_CARE, 0, 0, "Care: Emergency"},           // 0 = Emergency in careTypes
-        {FIELD_STAY, 25, 1000000, "Duration > 24 hours"} // 25 or more = more than 24
+        {FIELD_CARE, 0, 0, "Care: Emergency"},
+        {FIELD_STAY, 25, 1000000, "Duration > 24 hours"}
     };
 
     cout << "\n========== PERFORMANCE TEST (ARRAY) ==========\n";
     cout << "Each test is repeated " << RUNS << " times. Time is the average in microseconds.\n";
-    cout << "Binary search time does NOT include the insertion sort done before it.\n";
-    cout << "Extra Mem = extra memory used by the algorithm on top of the patient data.\n";
+    cout << "Binary search time does not include insertion sort.\n";
+    cout << "Extra Mem = auxiliary memory used by algorithm.\n";
     printLine(116);
     cout << left << setw(10) << "Facility" << setw(28) << "Operation" << setw(20) << "Field / Search"
          << right << setw(14) << "Avg Time (us)" << setw(14) << "Comparisons"
@@ -249,15 +225,11 @@ void performanceTest() {
     printComplexityTable();
 }
 
-// ------------------------------------------------------------
-// MAIN
-// ------------------------------------------------------------
 int main() {
     cout << "=====================================================\n";
     cout << "  HOSPITAL PATIENT MANAGEMENT SYSTEM (ARRAY VERSION)\n";
     cout << "=====================================================\n";
 
-    // Load the three CSV files into the three arrays
     for (int facility = 0; facility < NUM_FACILITIES; facility++) {
         if (!loadFile(fileNames[facility], patients[facility], patientCount[facility])) {
             cout << "Make sure the data folder is in the same folder you run the program from.\n";

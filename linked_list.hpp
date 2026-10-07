@@ -4,45 +4,37 @@
 #include "patient.hpp"
 #include <fstream>
 
-// One node of the singly linked list
 struct Node {
-    Patient data;   // the patient stored in this node
-    Node* next;     // pointer to the next node (NULL if this is the last node)
+    Patient data;
+    Node* next;
 };
 
-// The linked list for one facility
 struct LinkedList {
-    Node* head;     // first node
-    Node* tail;     // last node (so adding at the end is fast)
-    int count;      // number of nodes in the list
+    Node* head;
+    Node* tail;
+    int count;
 };
 
-// Basic linked list functions
-
-// Make the list empty (must be called before using a new list)
 void createList(LinkedList &list) {
     list.head = NULL;
     list.tail = NULL;
     list.count = 0;
 }
 
-// Add a patient to the end of the list
 void insertAtEnd(LinkedList &list, Patient p) {
     Node* newNode = new Node;
     newNode->data = p;
     newNode->next = NULL;
 
     if (list.head == NULL) {
-        list.head = newNode;        // list was empty, so the new node is the first node
+        list.head = newNode;
     } else {
-        list.tail->next = newNode;  // link the old last node to the new node
+        list.tail->next = newNode;
     }
-    list.tail = newNode;            // the new node is now the last node
+    list.tail = newNode;
     list.count++;
 }
 
-// Copy every patient from source into a new list called copy
-// (used so we can sort a copy and keep the original order)
 void copyList(const LinkedList &source, LinkedList &copy) {
     createList(copy);
     Node* current = source.head;
@@ -52,18 +44,16 @@ void copyList(const LinkedList &source, LinkedList &copy) {
     }
 }
 
-// Delete every node to free the memory
 void deleteList(LinkedList &list) {
     Node* current = list.head;
     while (current != NULL) {
-        Node* nextNode = current->next;   // remember the next node before deleting
+        Node* nextNode = current->next;
         delete current;
         current = nextNode;
     }
-    createList(list);   // the list is empty again
+    createList(list);
 }
 
-// Load patients from a CSV file into a linked list
 bool loadFile(string fileName, LinkedList &list) {
     ifstream file(fileName);
     if (!file) {
@@ -72,29 +62,27 @@ bool loadFile(string fileName, LinkedList &list) {
     }
 
     string line;
-    getline(file, line);   // skip the header line
+    getline(file, line);
     createList(list);
 
     while (getline(file, line)) {
         removeLineEnding(line);
         if (line == "") {
-            continue;   // skip empty lines
+            continue;
         }
 
         Patient p;
         if (!readPatientLine(line, p)) {
-            cout << "Warning: skipped patient " << p.id << " (missing or invalid value).\n";
             continue;
         }
 
-        insertAtEnd(list, p);   // add a new node at the end
+        insertAtEnd(list, p);
     }
 
     file.close();
     return true;
 }
 
-// Display patients (limit 0 = show all)
 void displayList(const LinkedList &list, int limit) {
     if (limit == 0 || limit > list.count) {
         limit = list.count;
@@ -111,18 +99,14 @@ void displayList(const LinkedList &list, int limit) {
     cout << "Showing " << shown << " of " << list.count << " patients.\n";
 }
 
-// BUBBLE SORT (ascending)
-// Compares each pair of neighbouring nodes and swaps their
-// patient data if they are in the wrong order. After each pass
-// the biggest value is at the end, so the next pass can stop
-// one node earlier. Stops early if a pass makes no swaps.
+// Bubble Sort on linked list (ascending)
 void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     if (list.head == NULL) {
-        return;   // nothing to sort
+        return;
     }
 
     bool swapped;
-    Node* lastSorted = NULL;   // nodes from here to the end are already sorted
+    Node* lastSorted = NULL;
 
     do {
         swapped = false;
@@ -131,7 +115,6 @@ void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
         while (current->next != lastSorted) {
             comparisons++;
             if (getValue(current->data, field) > getValue(current->next->data, field)) {
-                // swap the patient data of the two nodes
                 Patient temp = current->data;
                 current->data = current->next->data;
                 current->next->data = temp;
@@ -144,12 +127,7 @@ void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     } while (swapped);
 }
 
-// LINEAR SEARCH
-// Goes through the list node by node.
-// If the list is sorted by the same field, we can stop early
-// once the value is bigger than what we are looking for.
-// Returns the number of matches. Prints them if show is true.
-// checks counts how many patients were looked at.
+// Linear Search with optional early stop if list is sorted
 int linearSearch(const LinkedList &list, const SearchQuery &query, bool isSorted,
                  bool show, int &checks) {
     int matches = 0;
@@ -163,7 +141,7 @@ int linearSearch(const LinkedList &list, const SearchQuery &query, bool isSorted
             matches++;
             if (show) printPatient(current->data);
         } else if (isSorted && value > query.high) {
-            break;   // sorted list, so nothing after this can match
+            break;
         }
         current = current->next;
     }
