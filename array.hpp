@@ -1,9 +1,3 @@
-// ============================================================
-//  array.hpp
-//  Used by the ARRAY program only.
-//  Loading, displaying, Insertion Sort, Linear Search and
-//  Binary Search for an array of patients.
-// ============================================================
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
 
@@ -12,9 +6,7 @@
 
 const int MAX_PATIENTS = 500;   // maximum patients one facility can hold
 
-// ------------------------------------------------------------
 // Load patients from a CSV file into an array
-// ------------------------------------------------------------
 bool loadFile(string fileName, Patient arr[], int &count) {
     ifstream file(fileName);
     if (!file) {
@@ -51,9 +43,7 @@ bool loadFile(string fileName, Patient arr[], int &count) {
     return true;
 }
 
-// ------------------------------------------------------------
 // Display patients (limit 0 = show all)
-// ------------------------------------------------------------
 void displayPatients(Patient arr[], int count, int limit) {
     if (limit == 0 || limit > count) {
         limit = count;
@@ -73,11 +63,9 @@ void copyArray(Patient source[], Patient destination[], int count) {
     }
 }
 
-// ------------------------------------------------------------
 // INSERTION SORT (ascending)
 // Takes each patient and shifts the bigger ones to the right
 // until the correct place for that patient is found.
-// ------------------------------------------------------------
 void insertionSort(Patient arr[], int count, int field, int &comparisons, int &shifts) {
     for (int i = 1; i < count; i++) {
         Patient current = arr[i];
@@ -97,12 +85,10 @@ void insertionSort(Patient arr[], int count, int field, int &comparisons, int &s
     }
 }
 
-// ------------------------------------------------------------
 // LINEAR SEARCH (works on unsorted data)
 // Checks every patient one by one.
 // Returns the number of matches. Prints them if show is true.
 // checks counts how many patients were looked at.
-// ------------------------------------------------------------
 int linearSearch(Patient arr[], int count, const SearchQuery &query, bool show, int &checks) {
     int matches = 0;
     for (int i = 0; i < count; i++) {
@@ -116,12 +102,10 @@ int linearSearch(Patient arr[], int count, const SearchQuery &query, bool show, 
     return matches;
 }
 
-// ------------------------------------------------------------
 // BINARY SEARCH (array must already be sorted by the same field)
 // Step 1: binary search to find any one patient inside the range
 // Step 2: move left to the first patient inside the range
 // Step 3: move right and collect every patient inside the range
-// ------------------------------------------------------------
 int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, int &checks) {
     int left = 0;
     int right = count - 1;

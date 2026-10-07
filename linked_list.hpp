@@ -1,9 +1,3 @@
-// ============================================================
-//  linked_list.hpp
-//  Used by the SINGLY LINKED LIST program only.
-//  The Node and LinkedList structs, basic list functions,
-//  loading, displaying, Bubble Sort and Linear Search.
-// ============================================================
 #ifndef LINKED_LIST_HPP
 #define LINKED_LIST_HPP
 
@@ -23,9 +17,7 @@ struct LinkedList {
     int count;      // number of nodes in the list
 };
 
-// ------------------------------------------------------------
 // Basic linked list functions
-// ------------------------------------------------------------
 
 // Make the list empty (must be called before using a new list)
 void createList(LinkedList &list) {
@@ -71,9 +63,7 @@ void deleteList(LinkedList &list) {
     createList(list);   // the list is empty again
 }
 
-// ------------------------------------------------------------
 // Load patients from a CSV file into a linked list
-// ------------------------------------------------------------
 bool loadFile(string fileName, LinkedList &list) {
     ifstream file(fileName);
     if (!file) {
@@ -104,9 +94,7 @@ bool loadFile(string fileName, LinkedList &list) {
     return true;
 }
 
-// ------------------------------------------------------------
 // Display patients (limit 0 = show all)
-// ------------------------------------------------------------
 void displayList(const LinkedList &list, int limit) {
     if (limit == 0 || limit > list.count) {
         limit = list.count;
@@ -123,13 +111,11 @@ void displayList(const LinkedList &list, int limit) {
     cout << "Showing " << shown << " of " << list.count << " patients.\n";
 }
 
-// ------------------------------------------------------------
 // BUBBLE SORT (ascending)
 // Compares each pair of neighbouring nodes and swaps their
 // patient data if they are in the wrong order. After each pass
 // the biggest value is at the end, so the next pass can stop
 // one node earlier. Stops early if a pass makes no swaps.
-// ------------------------------------------------------------
 void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     if (list.head == NULL) {
         return;   // nothing to sort
@@ -158,14 +144,12 @@ void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     } while (swapped);
 }
 
-// ------------------------------------------------------------
 // LINEAR SEARCH
 // Goes through the list node by node.
 // If the list is sorted by the same field, we can stop early
 // once the value is bigger than what we are looking for.
 // Returns the number of matches. Prints them if show is true.
 // checks counts how many patients were looked at.
-// ------------------------------------------------------------
 int linearSearch(const LinkedList &list, const SearchQuery &query, bool isSorted,
                  bool show, int &checks) {
     int matches = 0;
