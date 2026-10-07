@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Array program",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/array_program.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "windows": {
+        "miDebuggerPath": "gdb.exe"
+      },
+      "preLaunchTask": "Build Array program"
+    },
+    {
+      "name": "Singly linked-list program",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/linked_list_program.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "windows": {
+        "miDebuggerPath": "gdb.exe"
+      },
+      "preLaunchTask": "Build Singly linked-list program"
+    }
+  ]
+}
