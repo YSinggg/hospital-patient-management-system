@@ -1,8 +1,3 @@
-// ============================================================
-//  menu.hpp
-//  Used by BOTH programs.
-//  Functions that read the user's choices from the keyboard.
-// ============================================================
 #ifndef MENU_HPP
 #define MENU_HPP
 
