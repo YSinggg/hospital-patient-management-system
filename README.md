@@ -148,8 +148,3 @@ Located in the `data/` directory:
 - `dataset3_facility_c.csv`: 200 patient records from Facility C
 
 Data fields include `PatientID`, `Name`, `Age`, `Gender`, `CareType`, `LengthOfStay`, `BaseCostPerHour`, and `DaysVisitsPerYear`.
-
----
-
-## 👤 Author
-- **Sing** ([@YSinggg](https://github.com/YSinggg))
