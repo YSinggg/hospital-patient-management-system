@@ -1,5 +1,3 @@
-// Hospital Patient Management System - Singly Linked List Version
-
 #include "patient.hpp"
 #include "timer.hpp"
 #include "menu.hpp"

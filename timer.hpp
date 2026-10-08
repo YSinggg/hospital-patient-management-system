@@ -4,9 +4,8 @@
 #include <chrono>
 using namespace std;
 
-const int RUNS = 100; // repeat count for performance benchmark
+const int RUNS = 100;
 
-// Returns current time in microseconds
 double getTimeNow() {
     auto now = chrono::high_resolution_clock::now();
     return chrono::duration<double, micro>(now.time_since_epoch()).count();

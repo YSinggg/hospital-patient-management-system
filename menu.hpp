@@ -3,7 +3,7 @@
 
 #include "patient.hpp"
 
-// Read integer choice with validation
+// Retrieval with validation
 int readNumber(string message, int min, int max) {
     int value;
     while (true) {

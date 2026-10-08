@@ -99,7 +99,7 @@ void displayList(const LinkedList &list, int limit) {
     cout << "Showing " << shown << " of " << list.count << " patients.\n";
 }
 
-// Bubble Sort on linked list (ascending)
+// Bubble Sort ascending
 void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     if (list.head == NULL) {
         return;
@@ -127,7 +127,7 @@ void bubbleSort(LinkedList &list, int field, int &comparisons, int &swaps) {
     } while (swapped);
 }
 
-// Linear Search with optional early stop if list is sorted
+// Linear Search with sorted that early stop option
 int linearSearch(const LinkedList &list, const SearchQuery &query, bool isSorted,
                  bool show, int &checks) {
     int matches = 0;

@@ -49,9 +49,9 @@ struct Patient {
     string id;
     int age;
     string careType;
-    int careNumber;        // index in careTypes (0-5)
-    int lengthOfStay;      // hours
-    double costPerHour;    // MYR
+    int careNumber;
+    int lengthOfStay;
+    double costPerHour;
     int visitsPerYear;
     double totalCost;
 };
@@ -63,7 +63,7 @@ struct SearchQuery {
     string description;
 };
 
-// Returns age group index (0-4), or -1 if invalid
+// Get the index range
 int getAgeGroup(int age) {
     for (int i = 0; i < NUM_AGE_GROUPS; i++) {
         if (age >= ageGroupMin[i] && age <= ageGroupMax[i]) {
@@ -110,7 +110,7 @@ void removeLineEnding(string &line) {
     }
 }
 
-// Parse one line from CSV
+// Parse line from CSV
 bool readPatientLine(string line, Patient &p) {
     stringstream ss(line);
     string id, age, care, stay, rate, visits;
@@ -140,7 +140,7 @@ bool readPatientLine(string line, Patient &p) {
     return true;
 }
 
-// Format double to currency string with 2 decimals and commas
+// Formal money format same as MYR
 string formatMoney(double amount) {
     stringstream ss;
     ss << fixed << setprecision(2) << amount;

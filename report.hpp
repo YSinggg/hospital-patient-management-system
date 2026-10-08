@@ -4,7 +4,7 @@
 #include "patient.hpp"
 #include "menu.hpp"
 
-// Summary totals for one facility (or combined facilities)
+// Summary totals for each facility
 struct FacilityStats {
     int patients;
     double totalCost;

@@ -1,12 +1,9 @@
-// Hospital Patient Management System - Array Version
-
 #include "patient.hpp"
 #include "timer.hpp"
 #include "menu.hpp"
 #include "report.hpp"
 #include "array.hpp"
 
-// One array of patients for each facility
 Patient patients[NUM_FACILITIES][MAX_PATIENTS];
 int patientCount[NUM_FACILITIES];
 
@@ -135,11 +132,10 @@ void testInsertionSort(int facility, int field) {
                         comparisons, to_string(shifts), "-", sizeof(Patient));
 }
 
-void testSearch(int facility, const SearchQuery &query) {
+void testSearch(int facility, const SearchQuery &query) { // Linear search on original unsorted array
     int count = patientCount[facility];
     int checks = 0, matches = 0;
 
-    // Linear search on original unsorted array
     double totalTime = 0;
     for (int run = 0; run < RUNS; run++) {
         checks = 0;
@@ -194,7 +190,6 @@ void printComplexityTable() {
 }
 
 void performanceTest() {
-    // Test search queries
     SearchQuery tests[3] = {
         {FIELD_AGE, 61, 100, "Age 61-100"},
         {FIELD_CARE, 0, 0, "Care: Emergency"},

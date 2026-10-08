@@ -58,7 +58,7 @@ void copyArray(Patient source[], Patient destination[], int count) {
     }
 }
 
-// Insertion Sort (ascending)
+// Insertion Sort
 void insertionSort(Patient arr[], int count, int field, int &comparisons, int &shifts) {
     for (int i = 1; i < count; i++) {
         Patient current = arr[i];
@@ -92,13 +92,13 @@ int linearSearch(Patient arr[], int count, const SearchQuery &query, bool show, 
     return matches;
 }
 
-// Binary Search (range query on sorted array)
+// Binary Search
 int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, int &checks) {
     int left = 0;
     int right = count - 1;
     int found = -1;
 
-    // Find any match in range
+    // Tried any possible match
     while (left <= right) {
         int mid = (left + right) / 2;
         double value = getValue(arr[mid], query.field);
@@ -117,7 +117,7 @@ int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, 
         return 0;
     }
 
-    // Move to first matching element
+    // Start with first element
     int first = found;
     while (first > 0) {
         checks++;
@@ -128,7 +128,7 @@ int binarySearch(Patient arr[], int count, const SearchQuery &query, bool show, 
         }
     }
 
-    // Collect all elements within range
+    // Fetch all elements
     int matches = 0;
     for (int i = first; i < count; i++) {
         checks++;
