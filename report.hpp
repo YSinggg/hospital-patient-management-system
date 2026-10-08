@@ -408,10 +408,10 @@ void reportMenu(FacilityStats stats[]) {
 
     if (part == 1) {
         cout << "\n1. " << facilityNames[0] << "\n2. " << facilityNames[1]
-             << "\n3. " << facilityNames[2] << "\n4. All facilities combined\n";
+             << "\n3. " << facilityNames[2] << "\n4. All facilities\n";
         int choice = readNumber("Choose facility: ", 1, 4);
         if (choice == 4) {
-            printSection4(all, "ALL FACILITIES COMBINED");
+            printSection4(all, "ALL FACILITIES");
         } else {
             printSection4(stats[choice - 1], facilityNames[choice - 1]);
         }
@@ -423,7 +423,7 @@ void reportMenu(FacilityStats stats[]) {
         for (int facility = 0; facility < NUM_FACILITIES; facility++) {
             printSection4(stats[facility], facilityNames[facility]);
         }
-        printSection4(all, "ALL FACILITIES COMBINED");
+        printSection4(all, "ALL FACILITIES");
         printSection5(stats, all);
         printSection9(stats, all);
     }
