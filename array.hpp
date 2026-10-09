@@ -14,7 +14,7 @@ bool loadFile(string fileName, Patient arr[], int &count) {
     }
 
     string line;
-    getline(file, line); // header line
+    getline(file, line);
     count = 0;
 
     while (getline(file, line)) {
